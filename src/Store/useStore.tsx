@@ -18,10 +18,12 @@ interface State {
 type CounterAction =
   | { type: "SET_CHAMPIONS"; payload: string[] }
   | { type: "SET_GROUPS"; payload: any }
-  | { type: "SET_GROUP"; payload: any };
+  | { type: "SET_GROUP"; payload: any }
+  | { type: "SET_TEAM_COUNT"; payload: any }
+  | { type: "SET_NAMES"; payload: any };
 
 const initialState: State = {
-  groups: {},
+  groups: null,
   selectedIndex: null,
   champions: null,
 };
@@ -36,13 +38,27 @@ const reducer = (state: State, action: CounterAction) => {
   if (action.type === "SET_GROUPS") {
     return {
       ...state,
-      groups: action.payload,
+      groups: action.payload ? action.payload.groups : null,
+      selectedIndex: action.payload ? action.payload.selectedIndex : null,
     };
   }
   if (action.type === "SET_GROUP") {
     if (action.payload.groups) {
       const newGroups = {
-        groups: [{ name: "New Group" }],
+        groups: [
+          {
+            name: "New Group",
+            teams: {
+              counts: [1, 1],
+              champs: [[], []],
+              names: [[], []],
+            },
+            banned: [],
+            history: [],
+            names: ["", "", "", "", "", "", "", "", "", ""],
+          },
+        ],
+        selectedIndex: 0,
       };
 
       localStorage.setItem("heros-shuffle-app", JSON.stringify(newGroups));
@@ -50,9 +66,51 @@ const reducer = (state: State, action: CounterAction) => {
       return {
         ...state,
         selectedIndex: 0,
-        groups: { groups: [{ name: "New Group" }] },
+        groups: [
+          {
+            name: "New Group",
+            teams: {
+              counts: [1, 1],
+              champs: [[], []],
+              names: [[], []],
+            },
+            banned: [],
+            history: [],
+            names: ["", "", "", "", "", "", "", "", "", ""],
+          },
+        ],
+      };
+    } else {
+      return {
+        ...state,
+        selectedIndex: action.payload.index,
       };
     }
+  }
+  if (action.type === "SET_TEAM_COUNT") {
+    const newGroups = state.groups;
+    newGroups[action.payload.index].teams.counts[action.payload.team - 1] =
+      action.payload.count;
+    localStorage.setItem(
+      "heros-shuffle-app",
+      JSON.stringify({ selectedIndex: state.selectedIndex, groups: newGroups })
+    );
+    return {
+      ...state,
+      groups: newGroups,
+    };
+  }
+  if (action.type === "SET_NAMES") {
+    const newGroups = state.groups;
+    newGroups[action.payload.index].names[action.payload.team === 0 ? action.payload.nameIndex : action.payload.nameIndex + 5] = action.payload.name;
+    localStorage.setItem(
+      "heros-shuffle-app",
+      JSON.stringify({ selectedIndex: state.selectedIndex, groups: newGroups })
+    );
+    return {
+      ...state,
+      groups: newGroups,
+    };
   }
   return state;
 };
@@ -61,9 +119,7 @@ interface ProviderProps {
   children: React.ReactNode;
 }
 
-export const StoreProvider = ({
-  children,
-}: ProviderProps) => {
+export const StoreProvider = ({ children }: ProviderProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const location = useLocation();
 
@@ -84,7 +140,7 @@ export const StoreProvider = ({
     const storage = localStorage.getItem("heros-shuffle-app");
     dispatch({
       type: "SET_GROUPS",
-      payload: storage ? JSON.parse(storage) : {},
+      payload: storage ? JSON.parse(storage) : null,
     });
   }, [location.pathname]);
 

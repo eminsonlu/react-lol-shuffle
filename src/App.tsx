@@ -1,11 +1,10 @@
-import { Routes, Route } from 'react-router-dom';
-import Home from './Pages/Home';
-import Group from './Pages/Group';
+import { Routes, Route } from "react-router-dom";
+import Home from "./Pages/Home";
+import Group from "./Pages/Group";
 
-import Layout from './Components/Layout';
+import Layout from "./Components/Layout";
 
 function App() {
-
   return (
     <Routes>
       <Route path="/" element={<Layout />}>

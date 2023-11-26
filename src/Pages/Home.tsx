@@ -6,8 +6,22 @@ function App() {
 
   return (
     <>
-      {state.groups.groups ? (
-        <></>
+      {state.groups ? (
+        <div className="text-[#cecece] flex flex-col gap-4">
+          <p>{state.groups.length} adet grup bulundu.</p>
+          {state.groups.map((group: any, index: number) => (
+            <Link
+              to="/group"
+              onClick={() =>
+                dispatch({ type: "SET_GROUP", payload: { index } })
+              }
+              key={index}
+              className="px-4 py-2 bg-purple-700 text-center"
+            >
+              {group.name}
+            </Link>
+          ))}
+        </div>
       ) : (
         <div className="text-[#cecece] flex-col items-center gap-4 flex">
           <p>Herhangi bir grup bulunamadı.</p>
