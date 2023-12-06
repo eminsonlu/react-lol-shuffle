@@ -2,7 +2,6 @@ import React, { useContext, createContext, useReducer, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
 type ContextObject = {
-  children: React.ReactNode;
   state: State;
   dispatch: React.Dispatch<CounterAction>;
 };
@@ -20,7 +19,10 @@ type CounterAction =
   | { type: "SET_GROUPS"; payload: any }
   | { type: "SET_GROUP"; payload: any }
   | { type: "SET_TEAM_COUNT"; payload: any }
-  | { type: "SET_NAMES"; payload: any };
+  | { type: "SET_NAMES"; payload: any }
+  | { type: "SET_NAME_POINT"; payload: any }
+  | { type: "SET_BANNED"; payload: any }
+  | { type: "CHANGE_GROUP_NAME"; payload: any };
 
 const initialState: State = {
   groups: null,
@@ -44,20 +46,26 @@ const reducer = (state: State, action: CounterAction) => {
   }
   if (action.type === "SET_GROUP") {
     if (action.payload.groups) {
-      const newGroups = {
-        groups: [
-          {
-            name: "New Group",
-            teams: {
-              counts: [1, 1],
-              champs: [[], []],
-              names: [[], []],
-            },
-            banned: [],
-            history: [],
-            names: ["", "", "", "", "", "", "", "", "", ""],
+      const group = [
+        {
+          name: "New Group",
+          teams: {
+            counts: [1, 1],
+            champs: [[], []],
+            names: [[], []],
           },
-        ],
+          banned: [],
+          history: [],
+          names: Array.from(Array(10)).map(() => ({
+            id: crypto.randomUUID(),
+            name: "",
+            point: 0,
+          })),
+        },
+      ];
+
+      const newGroups = {
+        groups: group,
         selectedIndex: 0,
       };
 
@@ -66,19 +74,7 @@ const reducer = (state: State, action: CounterAction) => {
       return {
         ...state,
         selectedIndex: 0,
-        groups: [
-          {
-            name: "New Group",
-            teams: {
-              counts: [1, 1],
-              champs: [[], []],
-              names: [[], []],
-            },
-            banned: [],
-            history: [],
-            names: ["", "", "", "", "", "", "", "", "", ""],
-          },
-        ],
+        groups: group,
       };
     } else {
       return {
@@ -89,7 +85,7 @@ const reducer = (state: State, action: CounterAction) => {
   }
   if (action.type === "SET_TEAM_COUNT") {
     const newGroups = state.groups;
-    newGroups[action.payload.index].teams.counts[action.payload.team - 1] =
+    newGroups[action.payload.index].teams.counts[action.payload.team] =
       action.payload.count;
     localStorage.setItem(
       "heros-shuffle-app",
@@ -102,7 +98,51 @@ const reducer = (state: State, action: CounterAction) => {
   }
   if (action.type === "SET_NAMES") {
     const newGroups = state.groups;
-    newGroups[action.payload.index].names[action.payload.team === 0 ? action.payload.nameIndex : action.payload.nameIndex + 5] = action.payload.name;
+    newGroups[action.payload.index].names[
+      action.payload.team === 0
+        ? action.payload.nameIndex
+        : action.payload.nameIndex + 5
+    ].name = action.payload.name;
+    localStorage.setItem(
+      "heros-shuffle-app",
+      JSON.stringify({ selectedIndex: state.selectedIndex, groups: newGroups })
+    );
+    return {
+      ...state,
+      groups: newGroups,
+    };
+  }
+  if (action.type === "SET_NAME_POINT") {
+    const newGroups = state.groups;
+    newGroups[action.payload.index].names[
+      action.payload.team === 0
+        ? action.payload.nameIndex
+        : action.payload.nameIndex + 5
+    ].point = action.payload.point;
+    localStorage.setItem(
+      "heros-shuffle-app",
+      JSON.stringify({ selectedIndex: state.selectedIndex, groups: newGroups })
+    );
+    return {
+      ...state,
+      groups: newGroups,
+    };
+  }
+  if (action.type === "SET_BANNED") {
+    const newGroups = state.groups;
+    newGroups[action.payload.index].banned = action.payload.banned;
+    localStorage.setItem(
+      "heros-shuffle-app",
+      JSON.stringify({ selectedIndex: state.selectedIndex, groups: newGroups })
+    );
+    return {
+      ...state,
+      groups: newGroups,
+    };
+  }
+  if (action.type === "CHANGE_GROUP_NAME") {
+    const newGroups = state.groups;
+    newGroups[action.payload.index].name = action.payload.name;
     localStorage.setItem(
       "heros-shuffle-app",
       JSON.stringify({ selectedIndex: state.selectedIndex, groups: newGroups })
@@ -145,7 +185,7 @@ export const StoreProvider = ({ children }: ProviderProps) => {
   }, [location.pathname]);
 
   return (
-    <StoreContext.Provider value={{ children, state, dispatch }}>
+    <StoreContext.Provider value={{ state, dispatch }}>
       {children}
     </StoreContext.Provider>
   );
