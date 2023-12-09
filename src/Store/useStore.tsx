@@ -22,7 +22,8 @@ type CounterAction =
   | { type: "SET_NAMES"; payload: any }
   | { type: "SET_NAME_POINT"; payload: any }
   | { type: "SET_BANNED"; payload: any }
-  | { type: "CHANGE_GROUP_NAME"; payload: any };
+  | { type: "CHANGE_GROUP_NAME"; payload: any }
+  | { type: "SET_CHAMP_COUNT"; payload: any }
 
 const initialState: State = {
   groups: null,
@@ -56,6 +57,7 @@ const reducer = (state: State, action: CounterAction) => {
           },
           banned: [],
           history: [],
+          champCount: 0,
           names: Array.from(Array(10)).map(() => ({
             id: crypto.randomUUID(),
             name: "",
@@ -143,6 +145,18 @@ const reducer = (state: State, action: CounterAction) => {
   if (action.type === "CHANGE_GROUP_NAME") {
     const newGroups = state.groups;
     newGroups[action.payload.index].name = action.payload.name;
+    localStorage.setItem(
+      "heros-shuffle-app",
+      JSON.stringify({ selectedIndex: state.selectedIndex, groups: newGroups })
+    );
+    return {
+      ...state,
+      groups: newGroups,
+    };
+  }
+  if (action.type === "SET_CHAMP_COUNT") {
+    const newGroups = state.groups;
+    newGroups[action.payload.index].champCount = action.payload.count;
     localStorage.setItem(
       "heros-shuffle-app",
       JSON.stringify({ selectedIndex: state.selectedIndex, groups: newGroups })

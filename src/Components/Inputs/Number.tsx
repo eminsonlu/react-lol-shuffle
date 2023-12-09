@@ -29,9 +29,9 @@ const Number = (props: NumberProps) => {
   };
 
   return (
-    <div className="flex flex-col gap-2">
+    <div>
       <label htmlFor="number-input-1">{label}</label>
-      <div className="flex gap-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+      <div className="mt-2 flex gap-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
         <button onClick={handleDecrement}>
           <HiMinus />
         </button>

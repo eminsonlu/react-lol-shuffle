@@ -5,8 +5,20 @@ import { useStore, useModal } from "../Store";
 
 import BannedModal from "./Modal/Banneds";
 
+type Name = {
+  id: string;
+  name: string;
+  point: number;
+} | undefined;
+
+type Team = {
+  names: Name[];
+  champs: string[];
+} | null;
+
 type Group = {
   name: string | null;
+  champCount: number;
   teams: {
     counts: [number, number];
     champs: [string[], string[]];
@@ -31,12 +43,84 @@ const Group = () => {
     }
   }, [state.selectedIndex, state.groups]);
 
+  const Shuffle = () => {
+    let indexes = [];
+    let teamCount1 = group?.teams?.counts[0];
+    let teamCount2 = group?.teams?.counts[1];
+    let champCount = group?.champCount || 5;
+
+    if (teamCount1 && teamCount2) {
+      for (let i = 0; i < teamCount1; i++) {
+        indexes.push(i);
+      }
+      for (let i = 5; i < 5 + teamCount2; i++) {
+        indexes.push(i);
+      }
+    }
+
+    let isTemp = false;
+
+    for (let i = 0; i < indexes.length; i++) {
+      if (group?.names[indexes[i]].name === "") {
+        isTemp = true;
+        break;
+      }
+    }
+
+    if (isTemp) {
+      alert("İsimler boş olamaz.");
+      return;
+    }
+
+    let teamOne: Team = {
+      names: [],
+      champs: []
+    }
+
+    let teamTwo: Team = {
+      names: [],
+      champs: []
+    }
+
+    let champs = state?.champions?.filter(champ => !group?.banned.includes(champ)) || [];
+
+    let names: Name[] = [];
+
+    for (let i = 0; i < indexes.length; i++) {
+      names.push(group?.names[indexes[i]]);
+    }
+
+    for (let i = names.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * i);
+      const temp = names[i];
+      names[i] = names[j];
+      names[j] = temp;
+    }
+
+    teamOne.names = names.slice(0, teamCount1);
+    teamTwo.names = names.slice(teamCount1, names.length);
+
+    for (let i = champs?.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * i);
+      const temp = champs[i];
+      champs[i] = champs[j];
+      champs[j] = temp;
+    }
+
+    teamOne.champs = champs.slice(0, champCount);
+    teamTwo.champs = champs.slice(champCount, champCount * 2);
+
+    console.log(teamOne, teamTwo)
+    
+  };
+
   return (
     <div className="flex md:flex-row flex-col justify-between px-24 w-full">
       {group && (
         <>
           <div className="flex flex-col gap-8">
-            <input className="text-2xl bg-transparent" 
+            <input
+              className="text-2xl bg-transparent"
               value={group.name || ""}
               onChange={(e) => {
                 dispatch({
@@ -73,6 +157,24 @@ const Group = () => {
                     />
                   ))}
               </div>
+            </div>
+            <div className="flex">
+              <NumberInput
+                label="Champ"
+                value={group.champCount || 1}
+                min={1}
+                max={10}
+                step={1}
+                onChange={(value: number) => {
+                  dispatch({
+                    type: "SET_CHAMP_COUNT",
+                    payload: {
+                      index: state.selectedIndex,
+                      count: value,
+                    },
+                  });
+                }}
+              />
             </div>
             <div className="flex flex-col gap-4 h-[21rem]">
               <p className="text-lg">İsimler</p>
@@ -135,12 +237,24 @@ const Group = () => {
                   ))}
               </div>
             </div>
-            <div>
+            <div className="flex gap-4">
               <button
                 onClick={() => openModal(<BannedModal />)}
                 className="text-lg px-3 py-1 border rounded-lg underline"
               >
                 Banlanmalar
+              </button>
+              <button
+                onClick={() => openModal(<BannedModal />)}
+                className="text-lg px-3 py-1 border rounded-lg underline"
+              >
+                Geçmiş
+              </button>
+              <button
+                onClick={() => Shuffle()}
+                className="text-lg px-3 py-1 border border-purple-700 hover:text-purple-700 text-white bg-purple-700 hover:bg-transparent transition-all rounded-lg ml-auto animate-pulse"
+              >
+                Shuffle
               </button>
             </div>
           </div>
