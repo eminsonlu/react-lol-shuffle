@@ -54,7 +54,7 @@ const BannedModal = () => {
     <div className="md:min-w-[48rem] min-w-[24rem] lg:min-w-[64rem] flex md:flex-row flex-col bg-slate-800 rounded-lg shadow-lg p-3 gap-4">
       <div className="w-1/2">
         <h2 className="text-2xl">Yasaklar</h2>
-        <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 py-2 gap-2">
+        <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 pt-2 gap-2 max-h-[14rem] overflow-y-auto pr-2">
           {banned.map((champion, index) => (
             <div
               key={index}

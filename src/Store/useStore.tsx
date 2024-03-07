@@ -24,6 +24,7 @@ type CounterAction =
   | { type: "SET_BANNED"; payload: any }
   | { type: "CHANGE_GROUP_NAME"; payload: any }
   | { type: "SET_CHAMP_COUNT"; payload: any }
+  | { type: "SET_TEAMS"; payload: any };
 
 const initialState: State = {
   groups: null,
@@ -157,6 +158,23 @@ const reducer = (state: State, action: CounterAction) => {
   if (action.type === "SET_CHAMP_COUNT") {
     const newGroups = state.groups;
     newGroups[action.payload.index].champCount = action.payload.count;
+    localStorage.setItem(
+      "heros-shuffle-app",
+      JSON.stringify({ selectedIndex: state.selectedIndex, groups: newGroups })
+    );
+    return {
+      ...state,
+      groups: newGroups,
+    };
+  }
+  if (action.type === "SET_TEAMS") {
+    const newGroups = state.groups;
+    newGroups[action.payload.index].teams.champs[0] = action.payload.teamOne.champs;
+    newGroups[action.payload.index].teams.champs[1] = action.payload.teamTwo.champs;
+
+    newGroups[action.payload.index].teams.names[0] = action.payload.teamOne.names;
+    newGroups[action.payload.index].teams.names[1] = action.payload.teamTwo.names;
+    
     localStorage.setItem(
       "heros-shuffle-app",
       JSON.stringify({ selectedIndex: state.selectedIndex, groups: newGroups })

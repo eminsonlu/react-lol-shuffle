@@ -6,7 +6,7 @@ const Layout = () => {
     return (
         <div className="h-screen bg-[#111112] flex justify-center items-center text-white relative overflow-hidden">
             <Modal />
-            <div className="max-w-[20rem] aspect-[5/2] absolute top-12 left-1/2 -translate-x-1/2">
+            <div className="max-w-[12rem] aspect-[5/2] absolute top-3 left-1/2 -translate-x-1/2">
                 <img
                     src="https://upload.wikimedia.org/wikipedia/tr/7/77/League_of_Legends_logo.png"
                     alt="lol-logo"

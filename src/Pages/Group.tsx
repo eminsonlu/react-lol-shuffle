@@ -2,40 +2,28 @@ import { useEffect, useState } from "react";
 import NumberInput from "../Components/Inputs/Number";
 import NameInput from "../Components/Inputs/Name";
 import { useStore, useModal } from "../Store";
+import { GroupType } from "../Types";
+import Teams from "../Components/Teams";
 
 import BannedModal from "./Modal/Banneds";
 
-type Name = {
-  id: string;
-  name: string;
-  point: number;
-} | undefined;
+type Name =
+  | {
+      id: string;
+      name: string;
+      point: number;
+    }
+  | undefined;
 
 type Team = {
   names: Name[];
   champs: string[];
 } | null;
 
-type Group = {
-  name: string | null;
-  champCount: number;
-  teams: {
-    counts: [number, number];
-    champs: [string[], string[]];
-    names: [
-      { id: string; name: string; point: number }[],
-      { id: string; name: string; point: number }[]
-    ];
-  } | null;
-  names: { id: string; name: string; point: number }[];
-  banned: string[];
-  history: object[];
-};
-
 const Group = () => {
   const { state, dispatch } = useStore();
   const { openModal } = useModal() as any;
-  const [group, setGroup] = useState<Group | null>(null);
+  const [group, setGroup] = useState<GroupType | null>(null);
 
   useEffect(() => {
     if (state.groups && state.selectedIndex !== null) {
@@ -74,15 +62,16 @@ const Group = () => {
 
     let teamOne: Team = {
       names: [],
-      champs: []
-    }
+      champs: [],
+    };
 
     let teamTwo: Team = {
       names: [],
-      champs: []
-    }
+      champs: [],
+    };
 
-    let champs = state?.champions?.filter(champ => !group?.banned.includes(champ)) || [];
+    let champs =
+      state?.champions?.filter((champ) => !group?.banned.includes(champ)) || [];
 
     let names: Name[] = [];
 
@@ -110,15 +99,21 @@ const Group = () => {
     teamOne.champs = champs.slice(0, champCount);
     teamTwo.champs = champs.slice(champCount, champCount * 2);
 
-    console.log(teamOne, teamTwo)
-    
+    dispatch({
+      type: "SET_TEAMS",
+      payload: {
+        index: state.selectedIndex,
+        teamOne,
+        teamTwo,
+      },
+    });
   };
 
   return (
-    <div className="flex md:flex-row flex-col justify-between px-24 w-full">
+    <div className="flex md:flex-row flex-col justify-between gap-8 px-24 w-full">
       {group && (
         <>
-          <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-8 w-1/3">
             <input
               className="text-2xl bg-transparent"
               value={group.name || ""}
@@ -257,6 +252,9 @@ const Group = () => {
                 Shuffle
               </button>
             </div>
+          </div>
+          <div className="w-2/3 items-center justify-center flex">
+            {group?.teams?.champs[0].length > 0 && <Teams group={group} />}
           </div>
         </>
       )}

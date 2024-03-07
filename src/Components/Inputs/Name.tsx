@@ -46,9 +46,9 @@ const Name = (props: Props) => {
         }
         placeholder={text.placeholder}
         maxLength={text.maxCharacters}
-        className="text-sm focus:ring-0 border-none focus:border-none ring-0 bg-transparent text-gray-50"
+        className="text-sm focus:ring-0 border-none focus:border-none ring-0 bg-transparent text-gray-50 w-28 h-6"
       />
-      <div className="flex gap-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+      <div className="flex gap-2 text-sm bg-transparent text-gray-200 items-center">
         <button onClick={handleDecrement}>
           <HiMinus />
         </button>
