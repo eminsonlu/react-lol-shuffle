@@ -24,7 +24,8 @@ type CounterAction =
   | { type: "SET_BANNED"; payload: any }
   | { type: "CHANGE_GROUP_NAME"; payload: any }
   | { type: "SET_CHAMP_COUNT"; payload: any }
-  | { type: "SET_TEAMS"; payload: any };
+  | { type: "SET_TEAMS"; payload: any }
+  | { type: "DELETE_GROUP"; payload: any };
 
 const initialState: State = {
   groups: null,
@@ -48,37 +49,36 @@ const reducer = (state: State, action: CounterAction) => {
   }
   if (action.type === "SET_GROUP") {
     if (action.payload.groups) {
-      const group = [
-        {
-          name: "New Group",
-          teams: {
-            counts: [1, 1],
-            champs: [[], []],
-            names: [[], []],
-          },
-          banned: [],
-          history: [],
-          champCount: 0,
-          names: Array.from(Array(10)).map(() => ({
-            id: crypto.randomUUID(),
-            name: "",
-            point: 0,
-          })),
+      let oldGroups: { groups: any[], selectedIndex: number } | null = JSON.parse(localStorage.getItem("heros-shuffle-app") || "null");
+
+      const group = {
+        name: "New Group",
+        teams: {
+          counts: [1, 1],
+          champs: [[], []],
+          names: [[], []],
         },
-      ];
-
-      const newGroups = {
-        groups: group,
-        selectedIndex: 0,
+        banned: [],
+        history: [],
+        champCount: 0,
+        names: Array.from(Array(10)).map(() => ({
+          id: crypto.randomUUID(),
+          name: "",
+          point: 0,
+        })),
       };
 
-      localStorage.setItem("heros-shuffle-app", JSON.stringify(newGroups));
-
-      return {
-        ...state,
-        selectedIndex: 0,
-        groups: group,
-      };
+      if (oldGroups) {
+        oldGroups.groups.push(group);
+        oldGroups.selectedIndex = oldGroups.groups.length - 1;
+        console.log(oldGroups);
+        localStorage.setItem("heros-shuffle-app", JSON.stringify(oldGroups));
+      } else {
+        localStorage.setItem(
+          "heros-shuffle-app",
+          JSON.stringify({ selectedIndex: 0, groups: group })
+        );
+      }
     } else {
       return {
         ...state,
@@ -169,12 +169,28 @@ const reducer = (state: State, action: CounterAction) => {
   }
   if (action.type === "SET_TEAMS") {
     const newGroups = state.groups;
-    newGroups[action.payload.index].teams.champs[0] = action.payload.teamOne.champs;
-    newGroups[action.payload.index].teams.champs[1] = action.payload.teamTwo.champs;
+    newGroups[action.payload.index].teams.champs[0] =
+      action.payload.teamOne.champs;
+    newGroups[action.payload.index].teams.champs[1] =
+      action.payload.teamTwo.champs;
 
-    newGroups[action.payload.index].teams.names[0] = action.payload.teamOne.names;
-    newGroups[action.payload.index].teams.names[1] = action.payload.teamTwo.names;
-    
+    newGroups[action.payload.index].teams.names[0] =
+      action.payload.teamOne.names;
+    newGroups[action.payload.index].teams.names[1] =
+      action.payload.teamTwo.names;
+
+    localStorage.setItem(
+      "heros-shuffle-app",
+      JSON.stringify({ selectedIndex: state.selectedIndex, groups: newGroups })
+    );
+    return {
+      ...state,
+      groups: newGroups,
+    };
+  }
+  if (action.type === "DELETE_GROUP") {
+    const newGroups = state.groups;
+    newGroups.splice(action.payload, 1);
     localStorage.setItem(
       "heros-shuffle-app",
       JSON.stringify({ selectedIndex: state.selectedIndex, groups: newGroups })

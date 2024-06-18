@@ -6,6 +6,7 @@ import { GroupType } from "../Types";
 import Teams from "../Components/Teams";
 
 import BannedModal from "./Modal/Banneds";
+import { Link, redirect } from "react-router-dom";
 
 type Name =
   | {
@@ -109,8 +110,21 @@ const Group = () => {
     });
   };
 
+  const Delete = () => {
+    if (window.confirm("Bu takımı silmek istediğinize emin misiniz?")) {
+      dispatch({
+        type: "DELETE_GROUP",
+        payload: {
+          index: state.selectedIndex,
+        },
+      });
+      redirect("/");
+    }
+  };
+
   return (
     <div className="flex md:flex-row flex-col justify-between gap-8 px-24 w-full">
+      <Link className="absolute top-4 right-4 px-3 py-1 rounded-lg bg-white text-black" to="/">Geri</Link>
       {group && (
         <>
           <div className="flex flex-col gap-8 w-1/3">
@@ -239,17 +253,25 @@ const Group = () => {
               >
                 Banlanmalar
               </button>
-              <button
+              {/* <button
                 onClick={() => openModal(<BannedModal />)}
                 className="text-lg px-3 py-1 border rounded-lg underline"
               >
                 Geçmiş
-              </button>
+              </button> */}
               <button
                 onClick={() => Shuffle()}
                 className="text-lg px-3 py-1 border border-purple-700 hover:text-purple-700 text-white bg-purple-700 hover:bg-transparent transition-all rounded-lg ml-auto animate-pulse"
               >
                 Shuffle
+              </button>
+              <button
+                onClick={() => {
+                  Delete();
+                }}
+                className="px-3 py-1 text-lg border border-red-500 rounded-lg transition-all bg-red-500 text-white"
+              >
+                Sil
               </button>
             </div>
           </div>
