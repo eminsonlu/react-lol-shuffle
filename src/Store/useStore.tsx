@@ -41,16 +41,16 @@ const reducer = (state: State, action: CounterAction) => {
     };
   }
   if (action.type === "SET_GROUPS") {
+    console.log(action.payload);
     return {
       ...state,
-      groups: action.payload ? action.payload.groups : null,
-      selectedIndex: action.payload ? action.payload.selectedIndex : null,
+      groups: action.payload ? action.payload : null,
+      selectedIndex: null,
     };
   }
   if (action.type === "SET_GROUP") {
     if (action.payload.groups) {
-      let oldGroups: { groups: any[], selectedIndex: number } | null = JSON.parse(localStorage.getItem("heros-shuffle-app") || "null");
-
+      let oldGroups: any[] | null = JSON.parse(localStorage.getItem("heros-shuffle-app") || "null");
       const group = {
         name: "New Group",
         teams: {
@@ -67,17 +67,24 @@ const reducer = (state: State, action: CounterAction) => {
           point: 0,
         })),
       };
-
       if (oldGroups) {
-        oldGroups.groups.push(group);
-        oldGroups.selectedIndex = oldGroups.groups.length - 1;
-        console.log(oldGroups);
+        oldGroups.push(group);
         localStorage.setItem("heros-shuffle-app", JSON.stringify(oldGroups));
+        return {
+          ...state,
+          selectedIndex: oldGroups.length - 1,
+          groups: oldGroups,
+        };
       } else {
         localStorage.setItem(
           "heros-shuffle-app",
-          JSON.stringify({ selectedIndex: 0, groups: group })
+          JSON.stringify([group])
         );
+        return {
+          ...state,
+          selectedIndex: 0,
+          groups: [group],
+        };
       }
     } else {
       return {
@@ -92,7 +99,7 @@ const reducer = (state: State, action: CounterAction) => {
       action.payload.count;
     localStorage.setItem(
       "heros-shuffle-app",
-      JSON.stringify({ selectedIndex: state.selectedIndex, groups: newGroups })
+      JSON.stringify([newGroups])
     );
     return {
       ...state,
@@ -108,7 +115,7 @@ const reducer = (state: State, action: CounterAction) => {
     ].name = action.payload.name;
     localStorage.setItem(
       "heros-shuffle-app",
-      JSON.stringify({ selectedIndex: state.selectedIndex, groups: newGroups })
+      JSON.stringify([newGroups])
     );
     return {
       ...state,
@@ -124,7 +131,7 @@ const reducer = (state: State, action: CounterAction) => {
     ].point = action.payload.point;
     localStorage.setItem(
       "heros-shuffle-app",
-      JSON.stringify({ selectedIndex: state.selectedIndex, groups: newGroups })
+      JSON.stringify([newGroups])
     );
     return {
       ...state,
@@ -136,7 +143,7 @@ const reducer = (state: State, action: CounterAction) => {
     newGroups[action.payload.index].banned = action.payload.banned;
     localStorage.setItem(
       "heros-shuffle-app",
-      JSON.stringify({ selectedIndex: state.selectedIndex, groups: newGroups })
+      JSON.stringify([newGroups])
     );
     return {
       ...state,
@@ -148,7 +155,7 @@ const reducer = (state: State, action: CounterAction) => {
     newGroups[action.payload.index].name = action.payload.name;
     localStorage.setItem(
       "heros-shuffle-app",
-      JSON.stringify({ selectedIndex: state.selectedIndex, groups: newGroups })
+      JSON.stringify([newGroups])
     );
     return {
       ...state,
@@ -160,7 +167,7 @@ const reducer = (state: State, action: CounterAction) => {
     newGroups[action.payload.index].champCount = action.payload.count;
     localStorage.setItem(
       "heros-shuffle-app",
-      JSON.stringify({ selectedIndex: state.selectedIndex, groups: newGroups })
+      JSON.stringify([newGroups])
     );
     return {
       ...state,
@@ -181,7 +188,7 @@ const reducer = (state: State, action: CounterAction) => {
 
     localStorage.setItem(
       "heros-shuffle-app",
-      JSON.stringify({ selectedIndex: state.selectedIndex, groups: newGroups })
+      JSON.stringify([newGroups])
     );
     return {
       ...state,
@@ -193,7 +200,7 @@ const reducer = (state: State, action: CounterAction) => {
     newGroups.splice(action.payload, 1);
     localStorage.setItem(
       "heros-shuffle-app",
-      JSON.stringify({ selectedIndex: state.selectedIndex, groups: newGroups })
+      JSON.stringify([newGroups])
     );
     return {
       ...state,
