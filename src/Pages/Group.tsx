@@ -6,7 +6,8 @@ import { GroupType } from "../Types";
 import Teams from "../Components/Teams";
 
 import BannedModal from "./Modal/Banneds";
-import { Link, redirect } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
 
 type Name =
   | {
@@ -25,12 +26,19 @@ const Group = () => {
   const { state, dispatch } = useStore();
   const { openModal } = useModal() as any;
   const [group, setGroup] = useState<GroupType | null>(null);
+  const redirect = useNavigate();
 
   useEffect(() => {
     if (state.groups && state.selectedIndex !== null) {
       setGroup(state.groups[state.selectedIndex]);
     }
   }, [state.selectedIndex, state.groups]);
+
+  useEffect(() => {
+    if (state.selectedIndex === null) {
+      redirect("/");
+    }
+  }, [state.selectedIndex]);
 
   const Shuffle = () => {
     let indexes = [];
