@@ -11,11 +11,13 @@ const StoreContext = createContext<ContextObject | null>(null);
 interface State {
   groups: any;
   selectedIndex: number | null;
-  champions: string[] | null;
+  lolchampions: string[] | null;
+  mods: number;
+  valchampinos: { id: string; name: string }[] | null;
 }
 
 type CounterAction =
-  | { type: "SET_CHAMPIONS"; payload: string[] }
+  | { type: "SET_CHAMPIONS"; payload: any }
   | { type: "SET_GROUPS"; payload: any }
   | { type: "SET_GROUP"; payload: any }
   | { type: "SET_TEAM_COUNT"; payload: any }
@@ -25,19 +27,23 @@ type CounterAction =
   | { type: "CHANGE_GROUP_NAME"; payload: any }
   | { type: "SET_CHAMP_COUNT"; payload: any }
   | { type: "SET_TEAMS"; payload: any }
-  | { type: "DELETE_GROUP"; payload: any };
+  | { type: "DELETE_GROUP"; payload: any }
+  | { type: "SET_MODS"; payload: any };
 
 const initialState: State = {
   groups: null,
   selectedIndex: null,
-  champions: null,
+  lolchampions: null,
+  mods: 0,
+  valchampinos: null,
 };
 
 const reducer = (state: State, action: CounterAction) => {
   if (action.type === "SET_CHAMPIONS") {
     return {
       ...state,
-      champions: action.payload,
+      lolchampions: action.payload.lol,
+      valchampinos: action.payload.val,
     };
   }
   if (action.type === "SET_GROUPS") {
@@ -167,11 +173,11 @@ const reducer = (state: State, action: CounterAction) => {
     console.log("delete group");
 
     let oldGroups = state.groups;
-    let newGroups = []
+    let newGroups = [];
 
     for (let i = 0; i < oldGroups.length; i++) {
       if (i !== action.payload.index) {
-        newGroups.push(oldGroups[i])
+        newGroups.push(oldGroups[i]);
       }
     }
 
@@ -181,6 +187,12 @@ const reducer = (state: State, action: CounterAction) => {
       ...state,
       groups: newGroups,
       selectedIndex: null,
+    };
+  }
+  if (action.type === "SET_MODS") {
+    return {
+      ...state,
+      mods: action.payload,
     };
   }
   return state;
@@ -196,13 +208,25 @@ export const StoreProvider = ({ children }: ProviderProps) => {
 
   useEffect(() => {
     const func = async () => {
-      const fetched = await fetch(
+      let fetched = await fetch(
         "https://ddragon.leagueoflegends.com/cdn/13.22.1/data/en_US/champion.json"
       );
-      const json = await fetched.json();
-      const data = json.data;
-      const champions = Object.keys(data);
-      dispatch({ type: "SET_CHAMPIONS", payload: champions });
+      let json = await fetched.json();
+      let data = json.data;
+      let lolchampions = Object.keys(data);
+
+      fetched = await fetch("https://valorant-api.com/v1/agents");
+
+      json = await fetched.json();
+
+      let valchampinos = json.data.map((champ: any) => {
+        return { id: champ.uuid, name: champ.displayName };
+      });
+
+      dispatch({
+        type: "SET_CHAMPIONS",
+        payload: { lol: lolchampions, val: valchampinos },
+      });
     };
     func();
   }, []);

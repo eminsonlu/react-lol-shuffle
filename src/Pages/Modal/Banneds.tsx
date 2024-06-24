@@ -17,8 +17,8 @@ const BannedModal = () => {
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setVal(e.target.value);
     if (e.target.value.length < 2) return setFiltered([]);
-    if (state.champions === null) return;
-    const filtered = state.champions.filter(
+    if (state.lolchampions === null) return;
+    const filtered = state.lolchampions.filter(
       (champion) =>
         champion.toLowerCase().includes(e.target.value.toLowerCase()) &&
         !banned.includes(champion)

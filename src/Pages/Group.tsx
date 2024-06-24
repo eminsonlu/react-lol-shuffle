@@ -8,6 +8,7 @@ import Teams from "../Components/Teams";
 import BannedModal from "./Modal/Banneds";
 import { Link, useNavigate } from "react-router-dom";
 
+let mods = ["LOL", "VALO"];
 
 type Name =
   | {
@@ -80,7 +81,15 @@ const Group = () => {
     };
 
     let champs =
-      state?.champions?.filter((champ) => !group?.banned.includes(champ)) || [];
+      state.mods === 0
+        ? state?.lolchampions?.filter(
+            (champ) => !group?.banned.includes(champ)
+          ) || []
+        : state?.valchampinos
+            ?.filter((champ) => {
+              return !group?.banned.includes(champ.name);
+            })
+            .map((c) => c.name) || [];
 
     let names: Name[] = [];
 
@@ -132,7 +141,12 @@ const Group = () => {
 
   return (
     <div className="flex md:flex-row flex-col justify-between gap-8 px-24 w-full">
-      <Link className="absolute top-4 right-4 px-3 py-1 rounded-lg bg-white text-black" to="/">Geri</Link>
+      <Link
+        className="absolute top-4 right-4 px-3 py-1 rounded-lg bg-white text-black"
+        to="/"
+      >
+        Geri
+      </Link>
       {group && (
         <>
           <div className="flex flex-col gap-8 w-1/3">
@@ -149,6 +163,25 @@ const Group = () => {
                 });
               }}
             />
+            <div className="flex gap-3">
+              {mods.map((mod, index) => (
+                <div
+                  onClick={() => {
+                    dispatch({
+                      type: "SET_MODS",
+                      payload: index,
+                    });
+                  }}
+                  className={`px-2 py-1 cursor-pointer rounded ${
+                    state.mods === index
+                      ? "bg-red-800 text-white underline"
+                      : "bg-gray-900 text-gray-500"
+                  }`}
+                >
+                  {mod}
+                </div>
+              ))}
+            </div>
             <div className="flex flex-col gap-4">
               <p className="text-lg">Takım Sayıları</p>
               <div className="flex gap-2">
