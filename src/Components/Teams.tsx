@@ -48,7 +48,7 @@ const Teams = (props: TeamsProps) => {
           </div>
           <div className="flex gap-3">
             {props.group.teams.names[index].map((name) => (
-              <div key={name.name} className="flex gap-1">
+              <div key={name.id} className="flex gap-1">
                 <p>{name.name}</p>
                 <p>{name.point}</p>
               </div>
@@ -91,7 +91,7 @@ const Teams = (props: TeamsProps) => {
           });
 
           if (state.mods === 1) {
-            text += "\n\nHarita: " + props.group.teams.map;
+            text += "\n\nHarita: " + props.group.teams.map.name;
           }
 
           navigator.clipboard.writeText(text);
