@@ -220,7 +220,7 @@ const reducer = (state: State, action: CounterAction) => {
     let newGroups = state.groups;
 
     if (newGroups != null && state.selectedIndex != null) {
-    newGroups[state.selectedIndex].mods = action.payload;
+      newGroups[state.selectedIndex].mods = action.payload;
     }
 
     localStorage.setItem("heros-shuffle-app", JSON.stringify(newGroups));
@@ -268,9 +268,20 @@ export const StoreProvider = ({ children }: ProviderProps) => {
 
       json = await fetched.json();
 
-      let valchampinos = json.data.map((champ: any) => {
-        return { id: champ.uuid, name: champ.displayName };
-      });
+      let valchampinos: { id: string; name: string }[] = [];
+
+      for (let agent of json.data) {
+        if (valchampinos.some((champ) => champ.name === agent.displayName)) {
+          continue;
+        }
+
+        valchampinos.push({
+          id: agent.uuid,
+          name: agent.displayName,
+        });
+      }
+
+      console.log(json.data, valchampinos);
 
       fetched = await fetch("https://valorant-api.com/v1/maps");
 

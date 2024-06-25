@@ -37,7 +37,7 @@ const Teams = (props: TeamsProps) => {
           <div className="flex flex-wrap">
             {props.group.teams.champs[index].map((champion) => (
               <img
-                key={champion}
+                key={champion + Math.random()}
                 src={giveForMod(champion)}
                 alt={champion}
                 className={`${
