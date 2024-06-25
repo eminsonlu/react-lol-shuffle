@@ -14,13 +14,21 @@ const Teams = (props: TeamsProps) => {
 
   const giveForMod = (champion: string) => {
     if (state.mods === 0) {
-      return "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/" + CapitalizeFirstLetter(champion) + "_0.jpg";
+      return (
+        "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/" +
+        CapitalizeFirstLetter(champion) +
+        "_0.jpg"
+      );
     } else {
-      let cid = state?.valchampinos?.find((champ) => champ.name === champion)?.id;
+      let cid = state?.valchampinos?.find(
+        (champ) => champ.name === champion
+      )?.id;
 
-      return "https://media.valorant-api.com/agents/" + cid + "/displayicon.png";
+      return (
+        "https://media.valorant-api.com/agents/" + cid + "/displayicon.png"
+      );
     }
-  }
+  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -29,15 +37,18 @@ const Teams = (props: TeamsProps) => {
           <div className="flex flex-wrap">
             {props.group.teams.champs[index].map((champion) => (
               <img
+                key={champion}
                 src={giveForMod(champion)}
                 alt={champion}
-                className={`${state.mods === 0 ? "h-32 w-48" : "h-32 w-32"} object-cover`}
+                className={`${
+                  state.mods === 0 ? "h-32 w-48" : "h-32 w-32"
+                } object-cover`}
               />
             ))}
           </div>
           <div className="flex gap-3">
             {props.group.teams.names[index].map((name) => (
-              <div className="flex gap-1">
+              <div key={name.name} className="flex gap-1">
                 <p>{name.name}</p>
                 <p>{name.point}</p>
               </div>
@@ -46,7 +57,16 @@ const Teams = (props: TeamsProps) => {
         </div>
       ))}
       {state.mods === 1 && (
-        <span>Harita: <span className="underline">{props.group.teams.map}</span></span>
+        <>
+          <span>
+            Harita:{" "}
+            <span className="underline">{props.group.teams.map.name}</span>
+          </span>
+          <img
+            src={props.group.teams.map.imgUrl}
+            className="h-32 aspect-[45/10] object-cover"
+          />
+        </>
       )}
       <button
         onClick={() => {

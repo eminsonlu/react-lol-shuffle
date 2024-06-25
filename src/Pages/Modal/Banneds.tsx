@@ -69,7 +69,7 @@ const BannedModal = () => {
           ))}
         </div>
       </div>
-      <div className="w-1/2 min-h-[16rem]">
+      <div className="w-1/2 min-h-[16rem] max-h-[20rem]">
         <input
           className="bg-slate-700 rounded-lg w-full h-10 px-4"
           placeholder="Şampiyon Adı"

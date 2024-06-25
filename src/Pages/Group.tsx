@@ -6,6 +6,7 @@ import { GroupType } from "../Types";
 import Teams from "../Components/Teams";
 
 import BannedModal from "./Modal/Banneds";
+import ValorantBannedMaps from "./Modal/ValorantMap";
 import { Link, useNavigate } from "react-router-dom";
 
 let mods = ["LOL", "VALO"];
@@ -118,9 +119,20 @@ const Group = () => {
     teamTwo.champs = champs.slice(champCount, champCount * 2);
 
     // valorant map
-    let map = ""
-    if (state.mods === 1) {
-      map = state.valmaps ? state.valmaps[Math.floor(Math.random() * state.valmaps.length)].name : "";
+    let map = {};
+    if (state.mods === 1 && state.valmaps != null && state.valmaps.length > 0 && state.groups != null) {
+      let maps = state.valmaps.filter((map) => {
+        if (state.selectedIndex != null && state.groups != null) {
+          return !state.groups[state.selectedIndex].bannedMapsValorant.some(
+            (banned: { id: string; name: string; imgUrl: string }) =>
+              banned.id === map.id
+          );
+        }
+      });
+
+      let randomIndex = Math.floor(Math.random() * maps.length);
+
+      map = maps[randomIndex];
     }
 
     dispatch({
@@ -173,6 +185,7 @@ const Group = () => {
             <div className="flex gap-3">
               {mods.map((mod, index) => (
                 <div
+                  key={index}
                   onClick={() => {
                     dispatch({
                       type: "SET_MODS",
@@ -301,6 +314,14 @@ const Group = () => {
               >
                 Banlanmalar
               </button>
+              {state.mods === 1 && (
+                <button
+                  onClick={() => openModal(<ValorantBannedMaps />)}
+                  className="text-lg px-3 py-1 border rounded-lg underline"
+                >
+                  Val Map Ban
+                </button>
+              )}
               {/* <button
                 onClick={() => openModal(<BannedModal />)}
                 className="text-lg px-3 py-1 border rounded-lg underline"

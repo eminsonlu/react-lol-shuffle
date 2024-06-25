@@ -1,4 +1,5 @@
 import React, { useContext, createContext, useReducer, useEffect } from "react";
+import { GroupType } from "../Types";
 // import { useLocation } from "react-router-dom";
 
 type ContextObject = {
@@ -9,12 +10,12 @@ type ContextObject = {
 const StoreContext = createContext<ContextObject | null>(null);
 
 interface State {
-  groups: any;
+  groups: GroupType[] | null;
   selectedIndex: number | null;
   lolchampions: string[] | null;
   mods: number;
   valchampinos: { id: string; name: string }[] | null;
-  valmaps: {id: string, name: string}[] | null;
+  valmaps: { id: string; name: string; imgUrl: string }[] | null;
 }
 
 type CounterAction =
@@ -29,7 +30,9 @@ type CounterAction =
   | { type: "SET_CHAMP_COUNT"; payload: any }
   | { type: "SET_TEAMS"; payload: any }
   | { type: "DELETE_GROUP"; payload: any }
-  | { type: "SET_MODS"; payload: any };
+  | { type: "SET_MODS"; payload: any }
+  | { type: "SET_BANNED_MAPS_VALORANT"; payload: any }
+  | { type: "SET_MAIN_MODS"; payload: number };
 
 const initialState: State = {
   groups: null,
@@ -37,7 +40,7 @@ const initialState: State = {
   lolchampions: null,
   mods: 0,
   valchampinos: null,
-  valmaps: null
+  valmaps: null,
 };
 
 const reducer = (state: State, action: CounterAction) => {
@@ -46,7 +49,7 @@ const reducer = (state: State, action: CounterAction) => {
       ...state,
       lolchampions: action.payload.lol,
       valchampinos: action.payload.val,
-      valmaps: action.payload.maps
+      valmaps: action.payload.maps,
     };
   }
   if (action.type === "SET_GROUPS") {
@@ -68,6 +71,8 @@ const reducer = (state: State, action: CounterAction) => {
           champs: [[], []],
           names: [[], []],
         },
+        mods: 0,
+        bannedMapsValorant: [],
         banned: [],
         history: [],
         champCount: 0,
@@ -87,13 +92,16 @@ const reducer = (state: State, action: CounterAction) => {
       return {
         ...state,
         selectedIndex: action.payload.index,
+        mods: state.groups ? state.groups[action.payload.index].mods : 0,
       };
     }
   }
   if (action.type === "SET_TEAM_COUNT") {
     const newGroups = state.groups;
-    newGroups[action.payload.index].teams.counts[action.payload.team] =
-      action.payload.count;
+    if (newGroups) {
+      newGroups[action.payload.index].teams.counts[action.payload.team] =
+        action.payload.count;
+    }
     localStorage.setItem("heros-shuffle-app", JSON.stringify(newGroups));
     return {
       ...state,
@@ -101,12 +109,14 @@ const reducer = (state: State, action: CounterAction) => {
     };
   }
   if (action.type === "SET_NAMES") {
-    const newGroups = state.groups;
-    newGroups[action.payload.index].names[
-      action.payload.team === 0
-        ? action.payload.nameIndex
-        : action.payload.nameIndex + 5
-    ].name = action.payload.name;
+    let newGroups = state.groups;
+    if (newGroups) {
+      newGroups[action.payload.index].names[
+        action.payload.team === 0
+          ? action.payload.nameIndex
+          : action.payload.nameIndex + 5
+      ].name = action.payload.name;
+    }
     localStorage.setItem("heros-shuffle-app", JSON.stringify(newGroups));
     return {
       ...state,
@@ -114,12 +124,14 @@ const reducer = (state: State, action: CounterAction) => {
     };
   }
   if (action.type === "SET_NAME_POINT") {
-    const newGroups = state.groups;
-    newGroups[action.payload.index].names[
-      action.payload.team === 0
-        ? action.payload.nameIndex
-        : action.payload.nameIndex + 5
-    ].point = action.payload.point;
+    let newGroups = state.groups;
+    if (newGroups) {
+      newGroups[action.payload.index].names[
+        action.payload.team === 0
+          ? action.payload.nameIndex
+          : action.payload.nameIndex + 5
+      ].point = action.payload.point;
+    }
     localStorage.setItem("heros-shuffle-app", JSON.stringify(newGroups));
     return {
       ...state,
@@ -127,8 +139,10 @@ const reducer = (state: State, action: CounterAction) => {
     };
   }
   if (action.type === "SET_BANNED") {
-    const newGroups = state.groups;
-    newGroups[action.payload.index].banned = action.payload.banned;
+    let newGroups = state.groups;
+    if (newGroups) {
+      newGroups[action.payload.index].banned = action.payload.banned;
+    }
     localStorage.setItem("heros-shuffle-app", JSON.stringify(newGroups));
     return {
       ...state,
@@ -136,8 +150,10 @@ const reducer = (state: State, action: CounterAction) => {
     };
   }
   if (action.type === "CHANGE_GROUP_NAME") {
-    const newGroups = state.groups;
-    newGroups[action.payload.index].name = action.payload.name;
+    let newGroups = state.groups;
+    if (newGroups) {
+      newGroups[action.payload.index].name = action.payload.name;
+    }
     localStorage.setItem("heros-shuffle-app", JSON.stringify(newGroups));
     return {
       ...state,
@@ -145,8 +161,10 @@ const reducer = (state: State, action: CounterAction) => {
     };
   }
   if (action.type === "SET_CHAMP_COUNT") {
-    const newGroups = state.groups;
-    newGroups[action.payload.index].champCount = action.payload.count;
+    let newGroups = state.groups;
+    if (newGroups) {
+      newGroups[action.payload.index].champCount = action.payload.count;
+    }
     localStorage.setItem("heros-shuffle-app", JSON.stringify(newGroups));
     return {
       ...state,
@@ -154,18 +172,20 @@ const reducer = (state: State, action: CounterAction) => {
     };
   }
   if (action.type === "SET_TEAMS") {
-    const newGroups = state.groups;
-    newGroups[action.payload.index].teams.champs[0] =
-      action.payload.teamOne.champs;
-    newGroups[action.payload.index].teams.champs[1] =
-      action.payload.teamTwo.champs;
+    let newGroups = state.groups;
+    if (newGroups) {
+      newGroups[action.payload.index].teams.champs[0] =
+        action.payload.teamOne.champs;
+      newGroups[action.payload.index].teams.champs[1] =
+        action.payload.teamTwo.champs;
 
-    newGroups[action.payload.index].teams.names[0] =
-      action.payload.teamOne.names;
-    newGroups[action.payload.index].teams.names[1] =
-      action.payload.teamTwo.names;
+      newGroups[action.payload.index].teams.names[0] =
+        action.payload.teamOne.names;
+      newGroups[action.payload.index].teams.names[1] =
+        action.payload.teamTwo.names;
 
-    newGroups[action.payload.index].teams.map = action.payload.map;
+      newGroups[action.payload.index].teams.map = action.payload.map;
+    }
 
     localStorage.setItem("heros-shuffle-app", JSON.stringify(newGroups));
 
@@ -180,9 +200,11 @@ const reducer = (state: State, action: CounterAction) => {
     let oldGroups = state.groups;
     let newGroups = [];
 
-    for (let i = 0; i < oldGroups.length; i++) {
-      if (i !== action.payload.index) {
-        newGroups.push(oldGroups[i]);
+    if (oldGroups) {
+      for (let i = 0; i < oldGroups.length; i++) {
+        if (i !== action.payload.index) {
+          newGroups.push(oldGroups[i]);
+        }
       }
     }
 
@@ -195,9 +217,31 @@ const reducer = (state: State, action: CounterAction) => {
     };
   }
   if (action.type === "SET_MODS") {
+    let newGroups = state.groups;
+
+    if (newGroups != null && state.selectedIndex != null) {
+    newGroups[state.selectedIndex].mods = action.payload;
+    }
+
+    localStorage.setItem("heros-shuffle-app", JSON.stringify(newGroups));
+
     return {
       ...state,
       mods: action.payload,
+      groups: newGroups,
+    };
+  }
+  if (action.type === "SET_BANNED_MAPS_VALORANT") {
+    const newGroups = state.groups;
+    if (newGroups) {
+      newGroups[action.payload.index].bannedMapsValorant = action.payload.maps;
+    }
+
+    localStorage.setItem("heros-shuffle-app", JSON.stringify(newGroups));
+
+    return {
+      ...state,
+      groups: newGroups,
     };
   }
   return state;
@@ -233,12 +277,16 @@ export const StoreProvider = ({ children }: ProviderProps) => {
       json = await fetched.json();
 
       let valmaps = json.data.map((map: any) => {
-        return { id: map.uuid, name: map.displayName };
+        return {
+          id: map.uuid,
+          name: map.displayName,
+          imgUrl: map.listViewIcon,
+        };
       });
 
       dispatch({
         type: "SET_CHAMPIONS",
-        payload: { lol: lolchampions, val: valchampinos, maps: valmaps},
+        payload: { lol: lolchampions, val: valchampinos, maps: valmaps },
       });
     };
     func();
