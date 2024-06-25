@@ -4,6 +4,7 @@ export type GroupType = {
   teams: {
     counts: [number, number];
     champs: [string[], string[]];
+    map: string,
     names: [
       { id: string; name: string; point: number }[],
       { id: string; name: string; point: number }[]

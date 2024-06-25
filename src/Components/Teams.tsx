@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { GroupType } from "../Types";
 import { useStore } from "../Store";
 
@@ -12,7 +11,6 @@ const CapitalizeFirstLetter = (word: string) => {
 
 const Teams = (props: TeamsProps) => {
   const { state } = useStore();
-  const [baseUrl, setBaseUrl] = useState<string>("");
 
   const giveForMod = (champion: string) => {
     if (state.mods === 0) {
@@ -47,27 +45,36 @@ const Teams = (props: TeamsProps) => {
           </div>
         </div>
       ))}
+      {state.mods === 1 && (
+        <span>Harita: <span className="underline">{props.group.teams.map}</span></span>
+      )}
       <button
         onClick={() => {
-          let text = "1.Takım\n\n";
+          let text = "1.Takım\n";
 
           props.group.teams.names[0].forEach((name) => {
-            text += name.name + "-" + name.point + " ";
+            // text += name.name + "-" + name.point + " ";
+            text += name.name + " ";
           });
-          text += "\n\n";
+          text += "\n";
           props.group.teams.champs[0].forEach((champion) => {
             text += champion + " ";
           });
-          text += "\n\n2.Takım\n\n";
+          text += "\n\n2.Takım\n";
           props.group.teams.names[1].forEach((name) => {
-            text += name.name + "-" + name.point + " ";
+            // text += name.name + "-" + name.point + " ";
+            text += name.name + " ";
           });
-          text += "\n\n";
+          text += "\n";
           props.group.teams.champs[1].forEach((champion) => {
             text += champion + " ";
           });
+
+          if (state.mods === 1) {
+            text += "\n\nHarita: " + props.group.teams.map;
+          }
+
           navigator.clipboard.writeText(text);
-          console.log(text);
         }}
         className="p-2 border rounded bg-slate-800 text-white"
       >

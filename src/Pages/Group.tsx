@@ -117,12 +117,19 @@ const Group = () => {
     teamOne.champs = champs.slice(0, champCount);
     teamTwo.champs = champs.slice(champCount, champCount * 2);
 
+    // valorant map
+    let map = ""
+    if (state.mods === 1) {
+      map = state.valmaps ? state.valmaps[Math.floor(Math.random() * state.valmaps.length)].name : "";
+    }
+
     dispatch({
       type: "SET_TEAMS",
       payload: {
         index: state.selectedIndex,
         teamOne,
         teamTwo,
+        map,
       },
     });
   };
@@ -149,7 +156,7 @@ const Group = () => {
       </Link>
       {group && (
         <>
-          <div className="flex flex-col gap-8 w-1/3">
+          <div className="flex flex-col justify-between w-1/3 h-full gap-2">
             <input
               className="text-2xl bg-transparent"
               value={group.name || ""}

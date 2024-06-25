@@ -14,6 +14,7 @@ interface State {
   lolchampions: string[] | null;
   mods: number;
   valchampinos: { id: string; name: string }[] | null;
+  valmaps: {id: string, name: string}[] | null;
 }
 
 type CounterAction =
@@ -36,6 +37,7 @@ const initialState: State = {
   lolchampions: null,
   mods: 0,
   valchampinos: null,
+  valmaps: null
 };
 
 const reducer = (state: State, action: CounterAction) => {
@@ -44,6 +46,7 @@ const reducer = (state: State, action: CounterAction) => {
       ...state,
       lolchampions: action.payload.lol,
       valchampinos: action.payload.val,
+      valmaps: action.payload.maps
     };
   }
   if (action.type === "SET_GROUPS") {
@@ -162,6 +165,8 @@ const reducer = (state: State, action: CounterAction) => {
     newGroups[action.payload.index].teams.names[1] =
       action.payload.teamTwo.names;
 
+    newGroups[action.payload.index].teams.map = action.payload.map;
+
     localStorage.setItem("heros-shuffle-app", JSON.stringify(newGroups));
 
     return {
@@ -223,9 +228,17 @@ export const StoreProvider = ({ children }: ProviderProps) => {
         return { id: champ.uuid, name: champ.displayName };
       });
 
+      fetched = await fetch("https://valorant-api.com/v1/maps");
+
+      json = await fetched.json();
+
+      let valmaps = json.data.map((map: any) => {
+        return { id: map.uuid, name: map.displayName };
+      });
+
       dispatch({
         type: "SET_CHAMPIONS",
-        payload: { lol: lolchampions, val: valchampinos },
+        payload: { lol: lolchampions, val: valchampinos, maps: valmaps},
       });
     };
     func();
