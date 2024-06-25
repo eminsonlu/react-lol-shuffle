@@ -67,7 +67,7 @@ const BannedModal = () => {
       <div className="w-1/2 flex flex-col gap-3 h-full relative">
         <p>Banlananlar</p>
         <div className="grid grid-cols-3 gap-2 overflow-auto pr-3">
-          {banned.map((map, index) => (
+          {banned && banned.map((map, index) => (
             <div onClick={() => onRemoveClick(map)} key={index}>
               <p className="px-2 py-1 bg-[#cecece] text-[#333] cursor-pointer hover:bg-[#cecece]/70">
                 {map.name}
@@ -79,7 +79,7 @@ const BannedModal = () => {
       <div className="w-1/2 relative h-full flex flex-col gap-3">
         <p>Açıklar</p>
         <div className="grid grid-cols-3 gap-2 overflow-auto pr-3">
-          {openMaps.map((map, index) => (
+          {openMaps && openMaps.map((map, index) => (
             <div onClick={() => onBanClick(map)} key={index}>
               <p className="px-2 py-1 bg-[#cecece] text-[#333] cursor-pointer hover:bg-[#cecece]/70">
                 {map.name}
