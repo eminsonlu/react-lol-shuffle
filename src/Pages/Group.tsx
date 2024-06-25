@@ -120,7 +120,12 @@ const Group = () => {
 
     // valorant map
     let map = {};
-    if (state.mods === 1 && state.valmaps != null && state.valmaps.length > 0 && state.groups != null) {
+    if (
+      state.mods === 1 &&
+      state.valmaps != null &&
+      state.valmaps.length > 0 &&
+      state.groups != null
+    ) {
       let maps = state.valmaps.filter((map) => {
         if (state.selectedIndex != null && state.groups != null) {
           return !state.groups[state.selectedIndex].bannedMapsValorant.some(
@@ -130,9 +135,13 @@ const Group = () => {
         }
       });
 
-      let randomIndex = Math.floor(Math.random() * maps.length);
+      if (maps.length > 0) {
+        let randomIndex = Math.floor(Math.random() * maps.length);
 
-      map = maps[randomIndex];
+        map = maps[randomIndex];
+      } else {
+        map = state.valmaps[0];
+      }
     }
 
     dispatch({
