@@ -75,7 +75,7 @@ const reducer = (state: State, action: CounterAction) => {
         bannedMapsValorant: [],
         banned: [],
         history: [],
-        champCount: 0,
+        champCount: 5,
         names: Array.from(Array(10)).map(() => ({
           id: crypto.randomUUID(),
           name: "",
