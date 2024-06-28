@@ -32,7 +32,8 @@ type CounterAction =
   | { type: "DELETE_GROUP"; payload: any }
   | { type: "SET_MODS"; payload: any }
   | { type: "SET_BANNED_MAPS_VALORANT"; payload: any }
-  | { type: "SET_MAIN_MODS"; payload: number };
+  | { type: "SET_MAIN_MODS"; payload: number }
+  | { type: "SET_MAP"; payload: any}
 
 const initialState: State = {
   groups: null,
@@ -235,6 +236,19 @@ const reducer = (state: State, action: CounterAction) => {
     const newGroups = state.groups;
     if (newGroups) {
       newGroups[action.payload.index].bannedMapsValorant = action.payload.maps;
+    }
+
+    localStorage.setItem("heros-shuffle-app", JSON.stringify(newGroups));
+
+    return {
+      ...state,
+      groups: newGroups,
+    };
+  }
+  if (action.type === "SET_MAP") {
+    const newGroups = state.groups;
+    if (newGroups) {
+      newGroups[action.payload.index].teams.map = action.payload.map;
     }
 
     localStorage.setItem("heros-shuffle-app", JSON.stringify(newGroups));

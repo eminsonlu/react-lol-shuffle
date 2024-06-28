@@ -10,7 +10,7 @@ const CapitalizeFirstLetter = (word: string) => {
 };
 
 const Teams = (props: TeamsProps) => {
-  const { state } = useStore();
+  const { state, dispatch } = useStore();
 
   const giveForMod = (champion: string) => {
     if (state.mods === 0) {
@@ -28,6 +28,40 @@ const Teams = (props: TeamsProps) => {
         "https://media.valorant-api.com/agents/" + cid + "/displayicon.png"
       );
     }
+  };
+
+  const randomMap = () => {
+    let map = {};
+    if (
+      state.mods === 1 &&
+      state.valmaps != null &&
+      state.valmaps.length > 0 &&
+      state.groups != null
+    ) {
+      let maps = state.valmaps.filter((map) => {
+        if (state.selectedIndex != null && state.groups != null) {
+          return !state.groups[state.selectedIndex].bannedMapsValorant.some(
+            (banned: { id: string; name: string; imgUrl: string }) =>
+              banned.id === map.id
+          );
+        }
+      });
+
+      if (maps.length > 0) {
+        let randomIndex = Math.floor(Math.random() * maps.length);
+
+        map = maps[randomIndex];
+      } else {
+        map = state.valmaps[0];
+      }
+    }
+    dispatch({
+      type: "SET_MAP",
+      payload: {
+        map: map,
+        index: state.selectedIndex,
+      },
+    })
   };
 
   return (
@@ -58,10 +92,18 @@ const Teams = (props: TeamsProps) => {
       ))}
       {state.mods === 1 && (
         <>
-          <span>
-            Harita:{" "}
-            <span className="underline">{props.group.teams.map.name}</span>
-          </span>
+          <div className="flex gap-4">
+            <span>
+              Harita:{" "}
+              <span className="underline">{props.group.teams.map.name}</span>
+            </span>
+            <button
+              onClick={() => randomMap()}
+              className="px-1 bg-white rounded text-black"
+            >
+              Shuffle
+            </button>
+          </div>
           <img
             src={props.group.teams.map.imgUrl}
             className="h-32 aspect-[45/10] object-cover"
