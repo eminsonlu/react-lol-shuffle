@@ -317,12 +317,14 @@ const Group = () => {
               </div>
             </div>
             <div className="flex gap-4">
-              <button
-                onClick={() => openModal(<BannedModal />)}
-                className="text-lg px-3 py-1 border rounded-lg underline"
-              >
-                Banlanmalar
-              </button>
+              {state.mods === 0 && (
+                <button
+                  onClick={() => openModal(<BannedModal />)}
+                  className="text-lg px-3 py-1 border rounded-lg underline"
+                >
+                  Banlanmalar
+                </button>
+              )}
               {state.mods === 1 && (
                 <button
                   onClick={() => openModal(<ValorantBannedMaps />)}
