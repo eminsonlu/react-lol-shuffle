@@ -2,6 +2,7 @@ import { HiOutlinePlus, HiMinus } from "react-icons/hi";
 import { useState } from "react";
 
 type Props = {
+  key: number;
   text: {
     placeholder: string;
     maxCharacters: number;
@@ -39,6 +40,7 @@ const Name = (props: Props) => {
   return (
     <div className="flex justify-between bg-[#333] border border-[#333] text-[#cecece] text-sm rounded-lg p-2">
       <input
+        tabIndex={props.key}
         type="text"
         value={text.value}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -49,13 +51,13 @@ const Name = (props: Props) => {
         className="text-sm focus:ring-0 border-none focus:border-none ring-0 bg-transparent text-gray-50 w-28 h-6 outline-none focus:outline-none"
       />
       <div className="flex gap-2 text-sm bg-transparent text-gray-200 items-center">
-        <button onClick={handleDecrement}>
+        <span className="cursor-pointer" onClick={handleDecrement}>
           <HiMinus />
-        </button>
+        </span>
         <p>{val}</p>
-        <button onClick={handleIncrement}>
+        <span className="cursor-pointer" onClick={handleIncrement}>
           <HiOutlinePlus />
-        </button>
+        </span>
       </div>
     </div>
   );
