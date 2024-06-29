@@ -84,9 +84,14 @@ const Teams = (props: TeamsProps) => {
             {props.group.teams.names[index].map((name) => (
               <div key={name.id} className="flex gap-1">
                 <p>{name.name}</p>
-                <p>{name.point}</p>
+                {/* <p>{name.point}</p> */}
               </div>
             ))}
+            <span className="underline font-bold">
+
+            {props.group.teams.priority[index] === 0 ? "Attack" : "Defense"}
+
+            </span>
           </div>
         </div>
       ))}

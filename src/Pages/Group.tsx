@@ -144,6 +144,11 @@ const Group = () => {
       }
     }
 
+    // priorities
+    let teamOneP = Math.floor(Math.random() * 2);
+    let teamTwoP = teamOneP === 0 ? 1 : 0;
+    let priority = [teamOneP, teamTwoP];
+
     dispatch({
       type: "SET_TEAMS",
       payload: {
@@ -151,6 +156,7 @@ const Group = () => {
         teamOne,
         teamTwo,
         map,
+        priority,
       },
     });
   };
